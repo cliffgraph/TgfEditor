@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Microsoft Visio、SVG Export により生成 ThiefEditor.svg ページ - 1 -->
+
+<svg
+   width="2.10666in"
+   height="2.10116in"
+   viewBox="0 0 151.679 151.283"
+   xml:space="preserve"
+   color-interpolation-filters="sRGB"
+   class="st9"
+   version="1.1"
+   id="svg74"
+   sodipodi:docname="ThiefEditor.svg"
+   inkscape:export-filename="C:\Users\Tomo\Downloads\Desktop\Development\MsxIoThief\TgfEditor\docs\ThiefEditor.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   inkscape:version="1.1.2 (b8e25be833, 2022-02-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/"><defs
+   id="defs78" /><sodipodi:namedview
+   id="namedview76"
+   pagecolor="#ffffff"
+   bordercolor="#999999"
+   borderopacity="1"
+   inkscape:pageshadow="0"
+   inkscape:pageopacity="0"
+   inkscape:pagecheckerboard="0"
+   inkscape:document-units="in"
+   showgrid="false"
+   inkscape:zoom="4.3279664"
+   inkscape:cx="50.485605"
+   inkscape:cy="100.74015"
+   inkscape:window-width="2560"
+   inkscape:window-height="1369"
+   inkscape:window-x="-8"
+   inkscape:window-y="-8"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="svg74" />
+	<v:documentProperties
+   v:langID="1041"
+   v:metric="true"
+   v:viewMarkup="false" />
+
+	<style
+   type="text/css"
+   id="style2">
+	<![CDATA[
+		.st1 {stroke:#ffffff;stroke-linecap:round;stroke-linejoin:round;stroke-width:25}
+		.st2 {stroke:#7f7f7f;stroke-linecap:round;stroke-linejoin:round;stroke-width:10}
+		.st3 {fill:#7f7f7f;stroke:#ffffff;stroke-linecap:round;stroke-linejoin:round;stroke-width:10}
+		.st4 {stroke:#ffffff;stroke-linecap:butt;stroke-width:4}
+		.st5 {stroke:#ffffff;stroke-linecap:butt;stroke-width:2.75}
+		.st6 {fill:#7f7f7f;stroke:#ffffff;stroke-linecap:round;stroke-linejoin:round;stroke-width:4.75}
+		.st7 {fill:#7f7f7f;stroke:#ffffff;stroke-linecap:round;stroke-linejoin:round;stroke-width:25}
+		.st8 {fill:#7f7f7f;stroke:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.75}
+		.st9 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<g
+   v:mID="0"
+   v:index="1"
+   v:groupContext="foregroundPage"
+   id="g72">
+		<title
+   id="title4">ページ - 1</title>
+		<v:pageProperties
+   v:drawingScale="0.0393701"
+   v:pageScale="0.0393701"
+   v:drawingUnits="24"
+   v:shadowOffsetX="8.50394"
+   v:shadowOffsetY="-8.50394" />
+		<g
+   id="shape162-1"
+   v:mID="162"
+   v:groupContext="shape"
+   transform="translate(12.5,-12.5)">
+			<title
+   id="title6">シート.162</title>
+			<path
+   d="M0 45.34 L0.4 25 L126.68 25 L126.68 151.28 L58.65 151.28"
+   class="st1"
+   id="path8" />
+		</g>
+		<g
+   id="shape163-4"
+   v:mID="163"
+   v:groupContext="shape"
+   transform="translate(12.5,-12.5)">
+			<title
+   id="title11">シート.163</title>
+			<path
+   d="M0 45.34 L0.4 25 L126.68 25 L126.68 151.28 L58.65 151.28"
+   class="st2"
+   id="path13" />
+		</g>
+		<g
+   id="group211-7"
+   transform="translate(5.16275,-5.41339)"
+   v:mID="211"
+   v:groupContext="group">
+			<title
+   id="title16">シート.211</title>
+			<g
+   id="shape212-8"
+   v:mID="212"
+   v:groupContext="shape"
+   transform="translate(0.264039,0.000230418) rotate(0.1)">
+				<title
+   id="title18">シート.212</title>
+				<path
+   d="M42.36 60.9 L21.04 25.51 L0 59.16 L0 151.28 L42.52 150.76 L42.36 60.9 Z"
+   class="st3"
+   id="path20" />
+			</g>
+			<g
+   id="shape213-10"
+   v:mID="213"
+   v:groupContext="shape"
+   transform="translate(3.5584,-89.8522)">
+				<title
+   id="title23">シート.213</title>
+				<path
+   d="M0 151.28 L36.13 151.28"
+   class="st4"
+   id="path25" />
+			</g>
+			<g
+   id="shape214-13"
+   v:mID="214"
+   v:groupContext="shape"
+   transform="translate(14.1732,-106.179)">
+				<title
+   id="title28">シート.214</title>
+				<path
+   d="M0 151.28 L15.59 151.28"
+   class="st5"
+   id="path30" />
+			</g>
+		</g>
+		<g
+   id="shape216-16"
+   v:mID="216"
+   v:groupContext="shape"
+   transform="translate(49.0998,-111.713)">
+			<title
+   id="title34">シート.216</title>
+			<rect
+   x="0"
+   y="144.197"
+   width="42.5197"
+   height="7.08661"
+   class="st6"
+   id="rect36" />
+		</g>
+		<g
+   id="shape217-18"
+   v:mID="217"
+   v:groupContext="shape"
+   transform="translate(54.0604,-98.9567)">
+			<title
+   id="title39">シート.217</title>
+			<rect
+   x="0"
+   y="144.197"
+   width="42.5197"
+   height="7.08661"
+   class="st6"
+   id="rect41" />
+		</g>
+		<g
+   id="shape218-20"
+   v:mID="218"
+   v:groupContext="shape"
+   transform="translate(60.4383,-86.2008)">
+			<title
+   id="title44">シート.218</title>
+			<rect
+   x="0"
+   y="144.197"
+   width="42.5197"
+   height="7.08661"
+   class="st6"
+   id="rect46" />
+		</g>
+		<g
+   id="group174-22"
+   transform="translate(52.8955,-26.6732)"
+   v:mID="174"
+   v:groupContext="group">
+			<title
+   id="title49">シート.174</title>
+			<g
+   id="shape157-23"
+   v:mID="157"
+   v:groupContext="shape"
+   transform="translate(-62.9218,29.5065) rotate(-30)">
+				<title
+   id="title51">シート.157</title>
+				<ellipse
+   cx="27.9604"
+   cy="130.224"
+   rx="27.9604"
+   ry="21.0592"
+   class="st7"
+   id="ellipse53" />
+			</g>
+			<g
+   id="shape166-25"
+   v:mID="166"
+   v:groupContext="shape"
+   transform="translate(44.8552,-27.7177)">
+				<title
+   id="title56">シート.166</title>
+				<path
+   d="M0 139.01 L0 82.69 L7.19 82.69 C7.46 82.93 6.22 82.99 19.74 92.75 C23.93 95.78 29.54 99.74 33.28 103.57         C37.24 107.61 39.1 111.51 40.2 115.4 C41.29 119.3 41.62 123.2 41.31 127.16 C41.01 131.1 40.08 135.11         39.04 135.91 C37.12 137.39 34.83 127.97 31.28 122.83 C29.92 120.85 28.36 119.5 25.63 117.76 C21.02 114.83         13.05 110.78 7.51 108.92 L7.44 151.28 L0 139.01 Z"
+   class="st7"
+   id="path58" />
+			</g>
+			<g
+   id="shape160-27"
+   v:mID="160"
+   v:groupContext="shape"
+   transform="translate(-62.9218,29.5065) rotate(-30)">
+				<title
+   id="title61">シート.160</title>
+				<ellipse
+   cx="27.9604"
+   cy="130.224"
+   rx="27.9604"
+   ry="21.0592"
+   class="st8"
+   id="ellipse63" />
+			</g>
+			<g
+   id="shape165-29"
+   v:mID="165"
+   v:groupContext="shape"
+   transform="translate(44.8552,-27.7177)">
+				<title
+   id="title66">シート.165</title>
+				<path
+   d="M0 139.01 L0 82.69 L7.19 82.69 C7.46 82.93 6.22 82.99 19.74 92.75 C23.93 95.78 29.54 99.74 33.28 103.57         C37.24 107.61 39.1 111.51 40.2 115.4 C41.3 119.3 41.63 123.2 41.32 127.16 C41.01 131.1 40.06 135.09         39.03 135.91 C37.13 137.4 34.96 128.06 31.17 122.75 C29.71 120.7 28.02 119.26 25.28 117.51 C20.65 114.57         13.05 110.78 7.51 108.92 L7.44 151.28 L0 139.01 Z"
+   class="st8"
+   id="path68" />
+			</g>
+		</g>
+	</g>
+</svg>
