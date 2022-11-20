@@ -81,7 +81,7 @@ static CGemBox g_GemBox;
 
 // 初期ウィンドウサイズ
 static const int WINDOW_W = 1094;
-static const int WINDOW_H = 400;
+static const int WINDOW_H = 420;
 
 struct Volume {
 	uint8_t		v8;
@@ -97,9 +97,11 @@ struct TgfRecord {
 	Volume					volume_opll;
 	Volume					volume_psg;
 	Volume					volume_scc;
-	bool					bSccPlus;
+	Volume					volume_sccplus;
+	bool					bSccAccess;
+	bool					bSccPlusAccess;
 	bool					bDeleteMaker;
-	TgfRecord() : tc(0), bSccPlus(false), bDeleteMaker(false)
+	TgfRecord() : tc(0), bSccAccess(false), bSccPlusAccess(false), bDeleteMaker(false)
 	{
 		pAtoms = NNEW std::vector<tgf::ATOM>();
 	}
@@ -160,10 +162,14 @@ static void arrangeTrack(TGFDATA *pTgf)
 	bool bInit = true;
 	SOUND_REGISTERS regs;
 	SOUND_REGISTERS_MOD regs_mod;
-	ZeroMemory(&regs, sizeof(regs));
-	ZeroMemory(&regs_mod, sizeof(regs_mod));
-	uint8_t oldPsg8 = 0, oldOpll8 = 0, oldScc8 = 0;
+	regs.clear();
+	regs_mod.clear();
+	uint8_t oldPsg8 = 0, oldOpll8 = 0, oldScc8 = 0, oldSccPlus8 = 0;
+	bool bScc = true;
+	bool bSccAccess = false;
 	bool bSccPlus = false;
+	bool bSccPlusAccess = false;
+	uint16_t sccModeReg = 0x00;
 	for (int t = 0; t < numAtom; ++t) {
 		const tgf::ATOM &dt = pData[t];
 		switch(dt.mark){
@@ -171,7 +177,8 @@ static void arrangeTrack(TGFDATA *pTgf)
 			{
 				pTr->regs = regs;
 				pTr->regs_mod = regs_mod;
-				pTr->bSccPlus = bSccPlus;
+				pTr->bSccAccess = bSccAccess;
+				pTr->bSccPlusAccess = bSccPlusAccess;
 				pTr->volume_psg.v8 =
 					(regs.psg[0x08]&0xf) + (regs.psg[0x09]&0xf) + (regs.psg[0x0a]&0xf);
 				pTr->volume_psg.vf =
@@ -183,20 +190,33 @@ static void arrangeTrack(TGFDATA *pTgf)
 					+(regs.opll[0x38]&0xf));
 				pTr->volume_opll.vf =
 					pTr->volume_opll.v8 / (0x0f * 9.f);
-				const int of = (bSccPlus) ? 0xAA : 0x8A;
+
+				int of;
+				of = 0x8A;
 				pTr->volume_scc.v8 =
 					regs.scc[0x0+of] + regs.scc[0x1+of] + regs.scc[0x2+of] + regs.scc[0x3+of] + regs.scc[0x4+of];
 				pTr->volume_scc.vf =
 					pTr->volume_scc.v8 / (0x0f * 5.f);
+				// SCC+
+				of = 0xAA;
+				pTr->volume_sccplus.v8 =
+					regs.sccplus[0x0+of] + regs.sccplus[0x1+of] + regs.sccplus[0x2+of] + regs.sccplus[0x3+of] + regs.sccplus[0x4+of];
+				pTr->volume_sccplus.vf =
+					pTr->volume_sccplus.v8 / (0x0f * 5.f);
 
 				pTr->volume_psg.mod		= (oldPsg8 != pTr->volume_psg.v8);
 				pTr->volume_opll.mod	= (oldOpll8 != pTr->volume_opll.v8);
 				pTr->volume_scc.mod		= (oldScc8 != pTr->volume_scc.v8);
+				pTr->volume_sccplus.mod	= (oldSccPlus8 != pTr->volume_sccplus.v8);
 				oldPsg8		= pTr->volume_psg.v8;
 				oldOpll8	= pTr->volume_opll.v8;
 				oldScc8		= pTr->volume_scc.v8;
+				oldSccPlus8	= pTr->volume_sccplus.v8;
+
 				pTgf->tracks.push_back(pTr);
 				pTr = NNEW TgfRecord();
+				bSccAccess = false;
+				bSccPlusAccess = false;
 				regs_mod.clear();
 				// 
 				pTr->tc = (static_cast<uint32_t>(dt.data1) << 16) | static_cast<uint32_t>(dt.data2);
@@ -233,18 +253,34 @@ static void arrangeTrack(TGFDATA *pTgf)
 			case tgf::MARK::SCC:
 			{
 				pTr->pAtoms->push_back(dt);
-				uint16_t ad = 0xFFFF;
-				if( 0x9800 <= dt.data1 && dt.data1 <= 0x98FF ){
-					ad = dt.data1 - 0x9800;
-					bSccPlus = false;
+				if (0x9000 <= dt.data1 && dt.data1 <= 0x97FF) {
+					const bool temp = bScc;
+					bScc = (((sccModeReg&0x20)==0x00) && (dt.data2 == 0x3F));
+					if (!temp && bScc) {
+						bSccPlus = false;
+					}
 				}
-				else if( 0xB800 <= dt.data1 && dt.data1 <= 0xB8FF ){
-					ad = dt.data1 - 0xB800;
-					bSccPlus = true;
+				else if (0xB000 <= dt.data1 && dt.data1 <= 0xB7FF) {
+					const bool temp = bSccPlus;
+					bSccPlus = (((sccModeReg & 0x30) == 0x20) && (dt.data2 == 0x80));
+					if (!temp && bSccPlus) {
+						bScc = false;
+					}
 				}
-				if( ad != 0xFFFF ){
+				else if (0xBFFE <= dt.data1 && dt.data1 <= 0xBFFF) {
+					sccModeReg = dt.data2;
+				}
+				else if (bScc && (0x9800 <= dt.data1 && dt.data1 <= 0x98FF)) {
+					int ad = dt.data1 - 0x9800;
 					regs.scc[ad] = static_cast<uint8_t>(dt.data2);
 					regs_mod.scc[ad] = true;
+					bSccAccess = true;
+				}
+				else if (bSccPlus && (0xB800 <= dt.data1 && dt.data1 <= 0xB8DF)) {
+					int ad = dt.data1 - 0xB800;
+					regs.sccplus[ad] = static_cast<uint8_t>(dt.data2);
+					regs_mod.sccplus[ad] = true;
+					bSccPlusAccess = true;
 				}
 				break;
 			}
@@ -323,55 +359,6 @@ static void stepTopIndex(int *pIndex, const int step, const int minv, const int 
 	return;
 }
 
-static void sendSnapShotDiff(const int targetIndex, CUdpSocket *pUdp)
-{
-	const int maxTraks = static_cast<int>(g_Tgf.tracks.size());
-	if( targetIndex < 0 || maxTraks <= targetIndex )
-		return;
-	const TgfRecord &tgtRec = *g_Tgf.tracks[targetIndex];
-	const int numAtoms = NUM_REG_OPLL + NUM_REG_PSG + NUM_REG_SCC;
-
-	tgpk::PACKET temp;
-	const size_t hdsize =
-		static_cast<size_t>(reinterpret_cast<uint8_t*>(&temp.atoms[0]) - reinterpret_cast<uint8_t*>(&temp.cmd));
-	const size_t sizePack = hdsize + sizeof(tgf::ATOM) * numAtoms;
-	std::unique_ptr<uint8_t[]> pSendDt(NNEW uint8_t[sizePack]);
-	tgpk::PACKET *pPack = reinterpret_cast<tgpk::PACKET*>(pSendDt.get());
-
-	pPack->cmd = tgpk::CMD::TG_ATOMS;
-	pPack->index = targetIndex;
-	pPack->maxIndex = maxTraks-1;
-	int cnt = 0;
-	for( int t = 0; t < NUM_REG_OPLL; ++t ){
-		tgf::ATOM &a = pPack->atoms[cnt++];
-		a.mark = tgf::MARK::OPLL;
-		a.data1 = t;
-		a.data2 = tgtRec.regs.opll[t];
-	}
-	for( int t = 0; t < NUM_REG_PSG; ++t ){
-		tgf::ATOM &a = pPack->atoms[cnt++];
-		a.mark = tgf::MARK::PSG;
-		a.data1 = t;
-		a.data2 = tgtRec.regs.psg[t];
-	}
-	for( int t = 0; t < NUM_REG_SCC; ++t ){
-		tgf::ATOM &a = pPack->atoms[cnt++];
-		a.mark = tgf::MARK::SCC;
-		a.data1 = (tgtRec.bSccPlus) ? (0xB800+t) : (0x9800+t);
-		a.data2 = tgtRec.regs.scc[t];
-	}
-	// 個数
-	pPack->num = cnt;
-
-	// 送信
-	if( 0 < cnt ){
-		const size_t sizeSendPack = hdsize + sizeof(tgf::ATOM) * cnt;
-		pUdp->SendBinary(pSendDt.get(), sizeSendPack);
-	}
-	return;
-}
-
-
 static void thread_CtrlTgp(HWND hWnd)
 {
 	std::unique_ptr<CUdpSocket> pUdp(NNEW CUdpSocket());
@@ -395,9 +382,6 @@ static void thread_CtrlTgp(HWND hWnd)
 
 			const int maxTraks = static_cast<int>(g_Tgf.tracks.size());
 			int curIndex = g_ThCursurIndex.load(std::memory_order_acquire);
-
-			// // スナップショットを送信する
-			// sendSnapShotDiff(curIndex, pUdp.get());
 
 			// 再生要求を送信する
 			temp.cmd = tgpk::CMD::REQUEST_PLAY;
@@ -746,6 +730,7 @@ static void paintVisualizer(
 		RGBREF opllCol = (dt.volume_opll.mod) ? RGBREF(0xff8080) : RGBREF(0x806060);
 		RGBREF psgCol = (dt.volume_psg.mod) ? RGBREF(0x80ff80) : RGBREF(0x608060);
 		RGBREF sccCol = (dt.volume_scc.mod) ? RGBREF(0x8080ff) : RGBREF(0x606080);
+		RGBREF sccpCol = (dt.volume_sccplus.mod) ? RGBREF(0x8080ff) : RGBREF(0x606080);
 
 		// OPLL
 		const float opllSY = TL_Y+TL_Height*(1.f- dt.volume_opll.vf)/2;
@@ -755,10 +740,25 @@ static void paintVisualizer(
 		const float psgSY = TL_Y+TL_Height*(1.f- dt.volume_psg.vf)/2;
 		const float psgDY = psgSY+TL_Height* dt.volume_psg.vf;
 		d.Line(x, psgSY, x, psgDY, 1.f, psgCol, 0.7f);
-		// PSG
+		// SCC
 		const float sccSY = TL_Y+TL_Height*(1.f- dt.volume_scc.vf)/2;
 		const float sccDY = sccSY+TL_Height* dt.volume_scc.vf;
 		d.Line(x, sccSY, x, sccDY, 1.f, sccCol, 0.7f);
+		// SCC+
+		const float sccpSY = TL_Y+TL_Height*(1.f- dt.volume_sccplus.vf)/2;
+		const float sccpDY = sccpSY+TL_Height* dt.volume_sccplus.vf;
+		d.Line(x, sccpSY, x, sccpDY, 1.f, sccpCol, 0.7f);
+		// // SCC+ flag
+		// if (dt.bSccPlusAccess) {
+		// 	const float flagSY = TL_Y+TL_Height/2;
+		// 	d.Line(x, flagSY - 2.f, x, flagSY + 4.f, 1.f, RGBREF(0xffffff), 0.7f);
+		// }
+		// // SCC flag
+		// if (dt.bSccAccess) {
+		// 	const float flagSY = TL_Y+TL_Height/2;
+		// 	d.Line(x, flagSY - 2.f, x, flagSY + 4.f, 1.f, RGBREF(0xffffA0), 0.7f);
+		// }
+
 		// Delete
 		if(dt.bDeleteMaker ){
 			d.Line(x, TL_Y, x, TL_Y+TL_Height, 1.f, RGBREF(0x404040), 0.7f);
@@ -804,7 +804,6 @@ static void paintDumRegister(
 	const TgfRecord &curDt = *(tgf.tracks[tergetIndex]);
 	const float curIndexY = 250.f;
 	tostringstream oss;
-//	oss << ((bPlayMusic)?_T("♪ "):_T("⇩ ")) << tergetIndex << _T("(") << curDt.tc << _T(")");
 	oss << ((bPlayMusic)?_T("♪ "):_T("⇩ ")) << tergetIndex;
 	d.MeasureText(CD2d::FONT::ARIAL_16, oss.str().c_str(), &textSize);
 	d.Rect(10.f-3.f, curIndexY-3.f, textSize.cx + 10.f, textSize.cy + 6.f, 1.0f, 3.0f, RGBREF(0x808080));
@@ -813,8 +812,9 @@ static void paintDumRegister(
 	const float dumpY = curIndexY+30;
 	const float dumpLH = 18;
 	d.Text(10.f, dumpY+ dumpLH*0, CD2d::FONT::ARIAL_12, _T("OPLL"), RGBREF(0xFF8080));
-	d.Text(10.f, dumpY+ dumpLH*1, CD2d::FONT::ARIAL_12, _T(" PSG"), RGBREF(0x80A080));
-	d.Text(10.f, dumpY+ dumpLH*2, CD2d::FONT::ARIAL_12, _T(" SCC"), RGBREF(0x8080FF));
+	d.Text(10.f, dumpY+ dumpLH*1, CD2d::FONT::ARIAL_12, _T("PSG "), RGBREF(0x80A080));
+	d.Text(10.f, dumpY+ dumpLH*2, CD2d::FONT::ARIAL_12, _T("SCC "), RGBREF(0x8080FF));
+	d.Text(10.f, dumpY+ dumpLH*3, CD2d::FONT::ARIAL_12, _T("SCC+"), RGBREF(0x8080FF));
 
 	for( int t = 0; t < NUM_REG_OPLL; ++t ){
 		RGBREF col =
@@ -834,14 +834,25 @@ static void paintDumRegister(
 		::_stprintf_s(temp, sizeof(temp) / sizeof(TCHAR), _T("%02X"), curDt.regs.psg[t]);
 		d.Text( (float)(18*t+50), dumpY+ dumpLH*1, CD2d::FONT::ARIAL_12, temp, col);
 	}
+	// SCC
 	for (int t = 0; t < (10+5+1); ++t) {
-		const int offset = (curDt.bSccPlus) ? 0xA0 : 0x80;
+		const int offset = 0x80;
 		const bool bMod = curDt.regs_mod.scc[t+offset];
 		const uint8_t vol = curDt.regs.scc[t+offset];
 		RGBREF col = (bMod) ? RGBREF(0xFF8080) : ((vol==0)?RGBREF(0xC0C0C0):RGBREF(0x808080));
 		TCHAR temp[2 + 1];
 		::_stprintf_s(temp, sizeof(temp) / sizeof(TCHAR), _T("%02X"), vol);
 		d.Text((float)(18 * t + 50), dumpY+ dumpLH*2, CD2d::FONT::ARIAL_12, temp, col);
+	}
+	// SCC+
+	for (int t = 0; t < (10+5+1); ++t) {
+		const int offset = 0xA0;
+		const bool bMod = curDt.regs_mod.sccplus[t+offset];
+		const uint8_t vol = curDt.regs.sccplus[t+offset];
+		RGBREF col = (bMod) ? RGBREF(0xFF8080) : ((vol==0)?RGBREF(0xC0C0C0):RGBREF(0x808080));
+		TCHAR temp[2 + 1];
+		::_stprintf_s(temp, sizeof(temp) / sizeof(TCHAR), _T("%02X"), vol);
+		d.Text((float)(18 * t + 50), dumpY+ dumpLH*3, CD2d::FONT::ARIAL_12, temp, col);
 	}
 	return;
 }
